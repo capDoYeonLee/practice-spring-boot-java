@@ -1,9 +1,13 @@
 package practice_anything.spring;
 
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.json.JsonWriter;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -11,11 +15,17 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class TestService {
+
+    @Autowired
+    @Lazy
+    private TestService self;
+
     private final MemberRepository memberRepository;
     private final TeamRepository teamRepository;
+    private final TestPropagationService testPropagationService;
 
     public void findMember(Long memberId) {
-        Member membr = memberRepository.findById(memberId).orElseThrow();
+        Member member = memberRepository.findById(memberId).orElseThrow();
         Team team = member.getTeam();
         System.out.println(team.getClass());
     }
@@ -46,6 +56,28 @@ public class TestService {
         Member member = Member.builder()
                               .name(testDto.getMemberName())
                               .team(team).build();
+        memberRepository.save(member);
+    }
+
+    @Transactional
+    public void saveTeam(TeamNameDto teamNameDto) {
+        Team team = Team.builder()
+                        .name(teamNameDto.getTeamName()).build();
+        team = teamRepository.save(team);
+        //testPropagationService.propagationSaveMember(team);
+        self.propagationSaveMember(team); // self injection??
+    }
+
+    //@Transactional(propagation = Propagation.REQUIRES_NEW) // 항상 새로운 트랜잭션 생성 // 기존 트랜잭션 잠시 중단
+    @Transactional(propagation = Propagation.SUPPORTS) // 이전에 트랜잭션이 있다면 참여 // 만약 없다면 트랜잭션 없이 실행
+    public void propagationSaveMember(Team team) {
+        String name = "tester";
+        team.updateTeamName("check update");
+        Member member = Member.builder()
+                              .name(name)
+                              .team(team)
+                              .build();
+
         memberRepository.save(member);
     }
 }

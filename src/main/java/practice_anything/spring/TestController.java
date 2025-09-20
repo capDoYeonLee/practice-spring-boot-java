@@ -39,5 +39,10 @@ public class TestController {
         testService.noNPlus();
     }
 
+    @PostMapping("/test-propagation")
+    public void testPropagation(@RequestBody TeamNameDto teamNameDto) {
+        testService.saveTeam(teamNameDto);
+    }
+
 
 }

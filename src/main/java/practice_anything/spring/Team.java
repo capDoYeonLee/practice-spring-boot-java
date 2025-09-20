@@ -28,4 +28,8 @@ public class Team {
 
     @OneToMany(mappedBy = "team")
     private List<Member> members = new ArrayList<>();
+
+    public void updateTeamName(String name) {
+        this.name = name;
+    }
 }
