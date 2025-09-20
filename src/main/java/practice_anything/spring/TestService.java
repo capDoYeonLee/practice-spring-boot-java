@@ -64,12 +64,13 @@ public class TestService {
         Team team = Team.builder()
                         .name(teamNameDto.getTeamName()).build();
         team = teamRepository.save(team);
-        //testPropagationService.propagationSaveMember(team);
-        self.propagationSaveMember(team); // self injection??
+        testPropagationService.propagationSaveMember(team);
+        //self.propagationSaveMember(team); // self injection??
+        //propagationSaveMember(team);
     }
 
-    //@Transactional(propagation = Propagation.REQUIRES_NEW) // 항상 새로운 트랜잭션 생성 // 기존 트랜잭션 잠시 중단
-    @Transactional(propagation = Propagation.SUPPORTS) // 이전에 트랜잭션이 있다면 참여 // 만약 없다면 트랜잭션 없이 실행
+    @Transactional(propagation = Propagation.REQUIRES_NEW) // 항상 새로운 트랜잭션 생성 // 기존 트랜잭션 잠시 중단
+    //@Transactional(propagation = Propagation.SUPPORTS) // 이전에 트랜잭션이 있다면 참여 // 만약 없다면 트랜잭션 없이 실행
     public void propagationSaveMember(Team team) {
         String name = "tester";
         team.updateTeamName("check update");
