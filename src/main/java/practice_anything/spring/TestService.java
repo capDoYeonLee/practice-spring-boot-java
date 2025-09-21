@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.List;
 
@@ -64,6 +65,10 @@ public class TestService {
         Team team = Team.builder()
                         .name(teamNameDto.getTeamName()).build();
         team = teamRepository.save(team);
+
+        String txName = TransactionSynchronizationManager.getCurrentTransactionName();
+        System.out.println("save Team method transction 현재 트랜잭션 이름 = " + txName);
+
         testPropagationService.propagationSaveMember(team);
         //self.propagationSaveMember(team); // self injection??
         //propagationSaveMember(team);
